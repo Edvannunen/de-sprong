@@ -102,13 +102,15 @@ export const actions: Actions = {
 			.run();
 	},
 
-	// Delete the piece and redirect home. SQLite cascade removes all its sources.
+	// Delete the piece and redirect home to the tab it came from.
+	// SQLite cascade removes all its sources.
 	// Note: source files are NOT cleaned up here — cascade delete bypasses our deleteFile helper.
 	// For a single-user local app this is acceptable; the uploads/ dir can be manually cleaned.
 	deletePiece: async ({ params }) => {
 		const id = Number(params.id);
+		const existing = db.select().from(piece).where(eq(piece.id, id)).get();
 		db.delete(piece).where(eq(piece.id, id)).run();
-		redirect(303, '/');
+		redirect(303, existing ? `/?tab=${existing.categoryId}` : '/');
 	},
 
 	// Add a new source to this piece, optionally with a file attachment.
