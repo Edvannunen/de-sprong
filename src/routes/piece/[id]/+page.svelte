@@ -55,15 +55,15 @@
 	}
 </script>
 
-<!-- Source page banner — shadow gives it depth; opacity toned down so it doesn't overpower the content -->
-<div class="max-w-2xl mx-auto border-y shadow-md" style="background-color: #FEF3C7; border-color: #D97706;">
-	<img src="/img/banner_source.png" alt="De Sprong" class="w-full opacity-50" />
+<!-- Source page banner -->
+<div class="max-w-2xl mx-auto border-y shadow-md">
+	<img src="/img/banner_source.png" alt="De Sprong" class="w-full" />
 </div>
 
 <main class="max-w-2xl mx-auto px-4 py-6">
 
 	<!-- Back link -->
-	<a href="/" class="btn btn-sm btn-ghost mb-4">← Back to list</a>
+	<a href="/?tab={data.piece.categoryId}" class="btn btn-sm btn-ghost mb-4">← Back to list</a>
 
 	<!-- ── PIECE HEADER ── -->
 	{#if editing}
@@ -443,6 +443,6 @@
 </main>
 
 <!-- Footer -->
-<div class="max-w-2xl mx-auto mt-8 border-y" style="background-color: #FEF3C7; border-color: #D97706;">
-	<img src="/img/footer.png" alt="" class="w-full opacity-50" />
+<div class="max-w-2xl mx-auto mt-8 border-y">
+	<img src="/img/footer.png" alt="" class="w-full" />
 </div>

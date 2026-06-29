@@ -5,6 +5,7 @@
 -->
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 	import { KEY_OPTIONS, PALETTE } from '$lib/constants';
 	import { dndzone } from 'svelte-dnd-action';
 	import type { PageData } from './$types';
@@ -13,7 +14,13 @@
 
 	// Track the active tab by category ID rather than by array index.
 	// This keeps the correct tab highlighted even after drag-and-drop reordering.
-	let activeTabId = $state<number | null>(data.categories[0]?.id ?? null);
+	// On load, restore the tab from the ?tab= param (set by the back link on the detail page).
+	const tabParam = Number(page.url.searchParams.get('tab'));
+	let activeTabId = $state<number | null>(
+		tabParam && data.categories.some((c) => c.id === tabParam)
+			? tabParam
+			: (data.categories[0]?.id ?? null)
+	);
 
 	// Which category's edit panel is currently open (null = none).
 	let editingTabId = $state<number | null>(null);
@@ -85,8 +92,8 @@
 </script>
 
 <!-- Top banner -->
-<div class="max-w-2xl mx-auto border-y shadow-md" style="background-color: #FEF3C7; border-color: #D97706;">
-	<img src="/img/banner_piece.png" alt="De Sprong" class="w-full opacity-50" />
+<div class="max-w-2xl mx-auto border-y shadow-md">
+	<img src="/img/banner_piece.png" alt="De Sprong" class="w-full" />
 </div>
 
 <main class="max-w-2xl mx-auto px-4 py-6">
@@ -459,6 +466,6 @@
 </main>
 
 <!-- Footer -->
-<div class="max-w-2xl mx-auto mt-8 border-y" style="background-color: #FEF3C7; border-color: #D97706;">
-	<img src="/img/footer.png" alt="" class="w-full opacity-50" />
+<div class="max-w-2xl mx-auto mt-8 border-y">
+	<img src="/img/footer.png" alt="" class="w-full" />
 </div>
