@@ -7,6 +7,6 @@ export default defineConfig({
 	out: './drizzle',
 	dialect: 'sqlite',
 	dbCredentials: {
-		url: './de-sprong.db'
+		url: './data/de-sprong.db'
 	}
 });
