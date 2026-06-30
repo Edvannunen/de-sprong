@@ -140,8 +140,33 @@
 	{/if}
 
 	<!-- ── SOURCE LIST ── -->
-	<!-- "Sources: x" shows the count at a glance — sources.length reflects the current (possibly reordered) list -->
-	<p class="text-sm font-semibold text-base-content/50 uppercase tracking-wide mb-3">Sources: {sources.length}</p>
+	<!-- "Sources: x" header with Edit/Save/Cancel mirrored at the top so the user doesn't need to scroll -->
+	<div class="flex items-center justify-between mb-3">
+		<p class="text-sm font-semibold text-base-content/50 uppercase tracking-wide">Sources: {sources.length}</p>
+		<div class="flex gap-2">
+			{#if editing}
+				<button
+					type="button"
+					class="btn btn-sm btn-primary"
+					onclick={() => {
+						if (showAddSource) {
+							if (confirm('Do you also want to save the new source?')) {
+								pendingPieceSave = true;
+								addSourceFormEl.requestSubmit();
+							} else {
+								pieceFormEl.requestSubmit();
+							}
+						} else {
+							pieceFormEl.requestSubmit();
+						}
+					}}
+				>Save</button>
+				<button type="button" class="btn btn-sm btn-ghost" onclick={() => { editing = false; showAddSource = false; }}>Cancel</button>
+			{:else}
+				<button type="button" class="btn btn-sm btn-primary" onclick={() => editing = true}>Edit</button>
+			{/if}
+		</div>
+	</div>
 
 	<!-- Hidden form to submit reorder action after drag-and-drop -->
 	<form

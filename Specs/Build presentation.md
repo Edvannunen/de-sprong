@@ -578,10 +578,167 @@ Claude staged the relevant files (skipping unrelated spec edits), committed dire
 
 ---
 
+## Phase 8 — Session 5: deploying to production (30 June)
+
+---
+
+### The plan
+
+**User:**
+> *"Can you help me with Hetzner VPS + Coolify installation. Make a plan"*
+
+Claude drew up a 6-phase deployment plan:
+
+1. Provision a Hetzner VPS (Ubuntu 24.04, Frankfurt)
+2. Install Coolify via SSH
+3. Connect GitHub to Coolify via a GitHub App
+4. Create the application in Coolify (build + start command, persistent storage, env vars)
+5. Domain + SSL
+6. Run migrations and seed production data
+
+---
+
+### Phase 1–3: server, Coolify, GitHub
+
+**User:**
+> *"Ok. Start with step 1"*
+
+Claude gave the exact Hetzner settings to pick (CX22, Ubuntu 24.04 LTS, Frankfurt), firewall rules, and the SSH command to connect. When the SSH host authenticity prompt appeared:
+
+**User:**
+> *"Getting this on Step 1.4"* *(screenshot of the fingerprint warning)*
+
+**Claude:** That's expected — type `yes`. It saves the server's fingerprint so you're not asked again.
+
+Coolify installed via a one-liner. GitHub connected through Coolify's GitHub App flow (automated installation, granting access to the `de-sprong` repository).
+
+---
+
+### Phase 4: wiring up the app — three code fixes
+
+Creating the app in Coolify was straightforward. But the first deploys failed with a cascade of errors — each one requiring a fix in the code.
+
+---
+
+**Fix 1 — Node version**
+
+Nixpacks (the Docker build system Coolify uses) was picking up Node 22.11.0, but the project requires ≥22.13.0. Adding a buildtime environment variable `NIXPACKS_NODE_VERSION=22.14.0` didn't bust the cached Docker layer. Fix: a `.node-version` file in the repo root — changing the file changes the Nixpacks plan hash, which forces a full cache rebuild.
+
+```
+22.14.0
+```
+
+---
+
+**Fix 2 — database directory missing at build time**
+
+```
+Cannot open database because the directory does not exist
+```
+
+SvelteKit analyses all routes at build time, which imports `db.ts`. But the `data/` directory doesn't exist inside the Docker build container. Fix: create it explicitly before opening the database.
+
+```typescript
+// src/lib/server/db.ts
+import fs from 'fs';
+fs.mkdirSync('data', { recursive: true });   // no-op if already exists
+const sqlite = new Database('data/de-sprong.db');
+```
+
+---
+
+**Fix 3 — wrong adapter**
+
+```
+Cannot find module '/app/build'
+```
+
+`adapter-auto` (SvelteKit's default) doesn't reliably produce a `build/` directory in a Docker/generic Node environment. Fix: switch to `adapter-node`, which always outputs to `build/`.
+
+```bash
+npm install @sveltejs/adapter-node
+```
+
+```javascript
+// svelte.config.js
+import adapter from '@sveltejs/adapter-node';
+```
+
+After these three fixes, the app deployed successfully and was live at `http://y9l6zmpclf2aviur1yogksya.167.233.148.65.sslip.io`.
+
+---
+
+### Persistent storage + database path
+
+In Coolify, a persistent volume was attached at `/app/data` — the directory where the app writes its SQLite database. Without this, every new deployment would wipe the database (Docker containers start with a clean filesystem).
+
+The database path was also updated consistently across all files from `de-sprong.db` to `data/de-sprong.db`.
+
+---
+
+### Auto-migrate on every deploy
+
+After the first successful deploy, the database was empty — migrations hadn't been run yet.
+
+**User:**
+> *"Will that not overwrite existing data in the production db when start?"*
+
+**Claude:** No. A migration only changes the *structure* of the database (creating or altering tables) — it never touches the data inside them. Drizzle also tracks which migrations have already been applied in a `__drizzle_migrations` table, so if everything is up to date it's a complete no-op.
+
+Fix: change the Coolify start command from `node build` to:
+
+```
+npm run db:migrate && node build
+```
+
+From that point on, every deployment applies any pending schema changes automatically before the server starts. If the schema hasn't changed, nothing happens.
+
+> **Note:** this is separate from the one-time import scripts (`db:seed`, `import-songs.ts`, `import-pop.ts`) that populated the 60 pieces. Those ran once to fill the database with initial content — they're never needed again. All future changes to the data happen through the app itself. The data survives deployments because it lives in the persistent volume (`/app/data`), not inside the container.
+
+---
+
+### Seeding production data
+
+With the database path and persistent volume now correct, all 60 pieces were imported directly into the running container:
+
+```bash
+docker exec <container-id> npm run db:seed
+docker exec <container-id> npx tsx scripts/import-songs.ts
+docker exec <container-id> npx tsx scripts/import-pop.ts
+```
+
+```
+Import complete. Created: 24, skipped: 0.   # Songs
+Import complete. Created: 36, skipped: 0.   # Pop
+```
+
+---
+
+### Saves weren't working — the CSRF catch
+
+After deployment the app loaded, data was visible — but nothing could be saved. Toggling Top Priority, changing a piece name: no effect. The Coolify logs showed nothing at all when a save was attempted.
+
+Empty logs on a form submission is the tell: SvelteKit's CSRF protection rejects POST requests where the `Origin` header doesn't match, *before* any application code runs — so nothing gets logged.
+
+The fix was adding an `ORIGIN` environment variable in Coolify:
+
+```
+ORIGIN = http://y9l6zmpclf2aviur1yogksya.167.233.148.65.sslip.io
+```
+
+First attempt used `https://` — still broken. Browser DevTools showed the request was being sent over plain `http://`. Changing to `http://` fixed it immediately.
+
+**User:**
+> *"It works. Thanks a lot! I would never been able to do this on my own"*
+
+> **Lesson:** Empty logs + 403 on a form POST = CSRF block. Check the `Origin` header in DevTools — it tells you exactly what value `ORIGIN` needs to be.
+
+---
+
 ## What's next
 
+- Domain + SSL (waiting for domain registration)
 - Playwright end-to-end test suite
-- Hosting setup: Hetzner VPS + Coolify
 - Authentication (later version)
 
 ---

@@ -276,8 +276,8 @@ The README should include:
 
 ## Later Versions (do not build yet)
 
-- Dynamic tabs: add, delete, rename, reorder
-- Search by name or key on the main page
+- Dynamic tabs: add, delete, rename, reorder, change color
+- Add Search by name or key on the main page
 - Authentication and multi-user (each user their own environment)
 - PWA (Progressive Web App) — installable on iPad/Android home screen
 - Native app (possibly via Capacitor or Tauri)
