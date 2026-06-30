@@ -92,7 +92,7 @@
 </script>
 
 <!-- Top banner -->
-<div class="max-w-2xl mx-auto shadow-xl">
+<div class="max-w-2xl mx-auto shadow-xl mb-0 rounded-b-none">
 	<img src="/img/banner.png" alt="De Sprong" class="w-full" />
 </div>
 
@@ -118,8 +118,8 @@
 	</form>
 
 	<div class="mb-6">
-		<!-- Row: draggable tab pills + "add category" button -->
-		<div class="flex gap-2 flex-wrap items-center">
+		<!-- Row: draggable tab pills + "add category" button — sticky so tabs stay visible while scrolling -->
+		<div class="flex items-center gap-2 flex-wrap py-3 border-b border-base-300 mb-4 bg-base-100 sticky top-0 z-10">
 
 			<!--
 			  DnD zone — contains only the draggable category pills.
@@ -367,7 +367,7 @@
 		<button type="submit" class="btn btn-sm btn-primary">+ Add</button>
 	</form>
 
-	<!-- Piece list table -->
+	<!-- Piece list -->
 	{#if activePieces.length === 0}
 		{#if searchQuery || filterKey}
 			<p class="text-base-content/50 text-sm">No pieces match this filter.</p>
@@ -377,90 +377,87 @@
 			<p class="text-base-content/50 text-sm">No pieces yet. Add one above.</p>
 		{/if}
 	{:else}
-		<table class="table table-zebra w-full">
-			<tbody>
-				{#each activePieces as p (p.id)}
-					{#if editingId === p.id}
-						<!-- EDIT ROW -->
-						<tr>
-							<td class="w-[85%]">
-								<form
-									id="edit-form-{p.id}"
-									method="POST"
-									action="?/editPiece"
-									use:enhance={() => {
-										return async ({ update }) => {
-											// After saving, close edit mode then refresh the page data
-											editingId = null;
-											await update();
-										};
-									}}
-								>
-									<input type="hidden" name="id" value={p.id} />
-									<input
-										type="text"
-										name="name"
-										value={p.name}
-										class="input input-bordered input-sm w-full"
-										required
-										autofocus
-										oninvalid={(e) => { (e.currentTarget as HTMLInputElement).setCustomValidity('Please fill in this field'); }}
-										oninput={(e) => { (e.currentTarget as HTMLInputElement).setCustomValidity(''); }}
-									/>
-								</form>
-							</td>
-							<td class="w-[8%]">
-								<select name="key" form="edit-form-{p.id}" class="select select-bordered select-sm w-full">
-									<option value="">—</option>
-									{#each KEY_OPTIONS as k}
-										<option value={k} selected={p.key === k}>{k}</option>
-									{/each}
-								</select>
-							</td>
-							<td class="text-right whitespace-nowrap">
-								<button type="submit" form="edit-form-{p.id}" class="btn btn-sm btn-primary">Save</button>
-								<button type="button" class="btn btn-sm btn-ghost" onclick={() => editingId = null}>Cancel</button>
-							</td>
-						</tr>
-					{:else}
-						<!-- VIEW ROW -->
-						<tr>
-							<td class="w-[85%]">
-								<!-- Music note icon: ♩ for top priority, ♫ for regular -->
-								<span class="mr-1 text-amber-600">{p.topPriority ? '♩' : '♫'}</span>
-								<a href="/piece/{p.id}" class="font-medium hover:underline">{p.name}</a>
-								{#if p.info}
-									<p class="text-sm text-base-content/60 line-clamp-2 mt-0.5">{p.info}</p>
-								{/if}
-							</td>
-							<td class="w-[8%] text-sm text-base-content/70">{p.key ?? ''}</td>
-							<td class="text-right whitespace-nowrap">
+		<div class="divide-y divide-base-200">
+			{#each activePieces as p (p.id)}
+				{#if editingId === p.id}
+					<!-- EDIT ROW -->
+					<div class="flex items-center gap-2 py-2 px-1 odd:bg-base-100 even:bg-base-200">
+						<div class="flex-1 min-w-0">
+							<form
+								id="edit-form-{p.id}"
+								method="POST"
+								action="?/editPiece"
+								use:enhance={() => {
+									return async ({ update }) => {
+										// After saving, close edit mode then refresh the page data
+										editingId = null;
+										await update();
+									};
+								}}
+							>
+								<input type="hidden" name="id" value={p.id} />
+								<input
+									type="text"
+									name="name"
+									value={p.name}
+									class="input input-bordered input-sm w-full"
+									required
+									autofocus
+									oninvalid={(e) => { (e.currentTarget as HTMLInputElement).setCustomValidity('Please fill in this field'); }}
+									oninput={(e) => { (e.currentTarget as HTMLInputElement).setCustomValidity(''); }}
+								/>
+							</form>
+						</div>
+						<select name="key" form="edit-form-{p.id}" class="select select-bordered select-sm w-24 shrink-0">
+							<option value="">—</option>
+							{#each KEY_OPTIONS as k}
+								<option value={k} selected={p.key === k}>{k}</option>
+							{/each}
+						</select>
+						<div class="flex gap-1 shrink-0">
+							<button type="submit" form="edit-form-{p.id}" class="btn btn-sm btn-primary">Save</button>
+							<button type="button" class="btn btn-sm btn-ghost" onclick={() => editingId = null}>Cancel</button>
+						</div>
+					</div>
+				{:else}
+					<!-- VIEW ROW -->
+					<div class="flex items-center gap-3 py-2.5 px-1 odd:bg-base-100 even:bg-base-200">
+						<div class="flex-1 min-w-0">
+							<!-- Music note icon: ♩ for top priority, ♫ for regular -->
+							<a href="/piece/{p.id}" class="font-medium text-base-content hover:text-primary">
+								<span class="mr-1 text-amber-600">{p.topPriority ? '♩' : '♫'}</span>{p.name}
+							</a>
+							{#if p.info}
+								<p class="text-xs text-base-content/50 truncate">{p.info}</p>
+							{/if}
+						</div>
+						{#if p.key}
+							<span class="badge badge-outline badge-sm font-mono shrink-0">{p.key}</span>
+						{/if}
+						<div class="flex items-center gap-1 shrink-0">
+							<button
+								type="button"
+								class="btn btn-ghost btn-xs"
+								onclick={() => editingId = p.id}
+							>Edit</button>
+							<!-- Delete: confirm first, then submit a hidden form -->
+							<form method="POST" action="?/deletePiece" use:enhance class="contents">
+								<input type="hidden" name="id" value={p.id} />
 								<button
-									type="button"
-									class="btn btn-sm btn-ghost"
-									onclick={() => editingId = p.id}
-								>Edit</button>
-
-								<!-- Delete: confirm first, then submit a hidden form -->
-								<form method="POST" action="?/deletePiece" use:enhance class="inline">
-									<input type="hidden" name="id" value={p.id} />
-									<button
-										type="submit"
-										class="btn btn-sm btn-ghost"
-										style="color: #92400E;"
-										onclick={(e) => {
-											if (!confirm(`Delete "${p.name}"? This cannot be undone.`)) {
-												e.preventDefault();
-											}
-										}}
-									>Delete</button>
-								</form>
-							</td>
-						</tr>
-					{/if}
-				{/each}
-			</tbody>
-		</table>
+									type="submit"
+									class="btn btn-ghost btn-xs text-error"
+									onclick={(e) => {
+										if (!confirm(`Delete "${p.name}"? This cannot be undone.`)) {
+											e.preventDefault();
+										}
+									}}
+								>Delete</button>
+							</form>
+						</div>
+					</div>
+				{/if}
+			{/each}
+		</div>
 	{/if}
 
 </main>

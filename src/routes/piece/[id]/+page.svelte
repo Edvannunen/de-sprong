@@ -63,7 +63,7 @@
 <main class="max-w-2xl mx-auto px-4 py-6">
 
 	<!-- Back link -->
-	<a href="/?tab={data.piece.categoryId}" class="btn btn-sm btn-ghost mb-4">← Back to list</a>
+	<a href="/?tab={data.piece.categoryId}" class="btn btn-ghost btn-sm gap-1 -ml-2 mb-4">← Back to list</a>
 
 	<!-- ── PIECE HEADER ── -->
 	{#if editing}
@@ -111,13 +111,13 @@
 		</form>
 	{:else}
 		<!-- View mode: piece fields are plain text -->
-		<div class="flex justify-between items-start mb-1">
+		<div class="flex items-start justify-between gap-4 mb-1">
 			<h1 class="text-2xl font-bold">
 				<span class="text-amber-600 mr-1">{data.piece.topPriority ? '♩' : '♫'}</span>
 				{data.piece.name}
 			</h1>
 			{#if data.piece.key}
-				<span class="text-xl font-semibold text-base-content/70">{data.piece.key}</span>
+				<span class="badge badge-outline badge-lg font-mono mt-1 shrink-0">{data.piece.key}</span>
 			{/if}
 		</div>
 		<!-- Top priority toggle — always visible in view mode, saves immediately on change -->
@@ -141,7 +141,7 @@
 
 	<!-- ── SOURCE LIST ── -->
 	<!-- "Sources: x" shows the count at a glance — sources.length reflects the current (possibly reordered) list -->
-	<h2 class="text-lg font-semibold mb-3 border-b pb-1">Sources: {sources.length}</h2>
+	<p class="text-sm font-semibold text-base-content/50 uppercase tracking-wide mb-3">Sources: {sources.length}</p>
 
 	<!-- Hidden form to submit reorder action after drag-and-drop -->
 	<form
@@ -165,7 +165,7 @@
 		{#each sources as src, i (src.id)}
 			<!-- Each source card gets the next pastel color from the palette (wrapping around) -->
 			{@const color = PALETTE[i % PALETTE.length]}
-			<div class="card border border-base-200 shadow-sm p-4" style="background-color: {color.bg}">
+			<div class="card border-l-4 border border-base-200 bg-base-100 shadow-sm p-4" style="border-left-color: {color.dark}">
 				{#if editing}
 					<!-- SOURCE EDIT MODE -->
 					<!-- Edit and delete forms are siblings (not nested) — nested forms are invalid HTML -->

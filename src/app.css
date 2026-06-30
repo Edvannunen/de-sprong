@@ -10,3 +10,8 @@
   --color-primary: #92400E;
   --color-primary-content: #ffffff;
 }
+
+/* Consistent row hover across the piece list table */
+tr:hover td {
+  background-color: oklch(var(--b2));
+}
