@@ -6,6 +6,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { base } from '$app/paths';
 	import { KEY_OPTIONS, PALETTE } from '$lib/constants';
 	import { detectLink } from '$lib/linkDetector';
 	import { dndzone } from 'svelte-dnd-action';
@@ -57,13 +58,13 @@
 
 <!-- Source page banner -->
 <div class="max-w-2xl mx-auto shadow-xl">
-	<img src="/img/banner.png" alt="De Sprong" class="w-full" />
+	<img src="{base}/img/banner.png" alt="De Sprong" class="w-full" />
 </div>
 
 <main class="max-w-2xl mx-auto px-4 py-6">
 
 	<!-- Back link -->
-	<a href="/?tab={data.piece.categoryId}" class="btn btn-ghost btn-sm gap-1 -ml-2 mb-4">← Back to list</a>
+	<a href="{base}/?tab={data.piece.categoryId}" class="btn btn-ghost btn-sm gap-1 -ml-2 mb-4">← Back to list</a>
 
 	<!-- ── PIECE HEADER ── -->
 	{#if editing}
@@ -256,7 +257,7 @@
 					{#if src.attachmentPath}
 						<div class="flex items-center gap-2 mb-2 text-sm text-base-content/70">
 							{#if src.attachmentType === 'image'}
-								<img src="/uploads/{src.attachmentPath}" alt="" class="h-8 w-8 object-cover rounded border border-base-200" />
+								<img src="{base}/uploads/{src.attachmentPath}" alt="" class="h-8 w-8 object-cover rounded border border-base-200" />
 							{/if}
 							<span class="truncate">{src.attachmentFilename}</span>
 							<form method="POST" action="?/deleteAttachment" use:enhance class="inline ml-auto shrink-0">
@@ -337,9 +338,9 @@
 					<!-- Attachment: image shows as a clickable thumbnail; PDF shows as a filename link -->
 					{#if src.attachmentType === 'image'}
 						<div class="mt-2">
-							<a href="/uploads/{src.attachmentPath}" target="_blank" rel="noopener noreferrer">
+							<a href="{base}/uploads/{src.attachmentPath}" target="_blank" rel="noopener noreferrer">
 								<img
-									src="/uploads/{src.attachmentPath}"
+									src="{base}/uploads/{src.attachmentPath}"
 									alt={src.attachmentFilename ?? 'Attachment'}
 									class="max-h-32 rounded border border-base-200 hover:opacity-80 transition-opacity"
 								/>
@@ -348,7 +349,7 @@
 					{:else if src.attachmentType === 'pdf'}
 						<div class="mt-2">
 							<a
-								href="/uploads/{src.attachmentPath}"
+								href="{base}/uploads/{src.attachmentPath}"
 								target="_blank"
 								rel="noopener noreferrer"
 								class="link link-primary text-sm"
@@ -485,5 +486,5 @@
 
 <!-- Footer -->
 <div class="max-w-2xl mx-auto mt-8 shadow-xl">
-	<img src="/img/footer.png" alt="" class="w-full" />
+	<img src="{base}/img/footer.png" alt="" class="w-full" />
 </div>

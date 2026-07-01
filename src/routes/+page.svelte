@@ -6,6 +6,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
+	import { base } from '$app/paths';
 	import { KEY_OPTIONS, PALETTE } from '$lib/constants';
 	import { dndzone } from 'svelte-dnd-action';
 	import type { PageData } from './$types';
@@ -93,7 +94,7 @@
 
 <!-- Top banner -->
 <div class="max-w-2xl mx-auto shadow-xl mb-0 rounded-b-none">
-	<img src="/img/banner.png" alt="De Sprong" class="w-full" />
+	<img src="{base}/img/banner.png" alt="De Sprong" class="w-full" />
 </div>
 
 <main class="max-w-2xl mx-auto px-4 py-6">
@@ -424,7 +425,7 @@
 					<div class="flex items-center gap-3 py-2.5 px-1 odd:bg-base-100 even:bg-base-200">
 						<div class="flex-1 min-w-0">
 							<!-- Music note icon: ♩ for top priority, ♫ for regular -->
-							<a href="/piece/{p.id}" class="font-medium text-base-content hover:text-primary">
+							<a href="{base}/piece/{p.id}" class="font-medium text-base-content hover:text-primary">
 								<span class="mr-1 text-amber-600">{p.topPriority ? '♩' : '♫'}</span>{p.name}
 							</a>
 							{#if p.info}
@@ -464,5 +465,5 @@
 
 <!-- Footer -->
 <div class="max-w-2xl mx-auto mt-8 shadow-xl">
-	<img src="/img/footer.png" alt="" class="w-full" />
+	<img src="{base}/img/footer.png" alt="" class="w-full" />
 </div>

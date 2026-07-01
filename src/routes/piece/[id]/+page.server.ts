@@ -8,6 +8,7 @@ import { randomUUID } from 'crypto';
 import { db } from '$lib/server/db';
 import { piece, source } from '$lib/server/schema';
 import { error, fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { asc, eq, max } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -110,7 +111,7 @@ export const actions: Actions = {
 		const id = Number(params.id);
 		const existing = db.select().from(piece).where(eq(piece.id, id)).get();
 		db.delete(piece).where(eq(piece.id, id)).run();
-		redirect(303, existing ? `/?tab=${existing.categoryId}` : '/');
+		redirect(303, existing ? `${base}/?tab=${existing.categoryId}` : `${base}/`);
 	},
 
 	// Add a new source to this piece, optionally with a file attachment.

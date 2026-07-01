@@ -7,6 +7,7 @@
 import { db } from '$lib/server/db';
 import { category, piece } from '$lib/server/schema';
 import { fail, redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 import { asc, eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -117,7 +118,7 @@ export const actions: Actions = {
 			.get();
 
 		// Redirect to the detail page so the user can add sources and more info.
-		redirect(303, `/piece/${result.id}`);
+		redirect(303, `${base}/piece/${result.id}`);
 	},
 
 	// Update a piece's name and key from inline edit on the main page.
