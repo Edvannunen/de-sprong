@@ -241,6 +241,14 @@
 							name="attachment"
 							accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
 							class="file-input file-input-bordered file-input-sm w-full mb-2"
+							onchange={(e) => {
+								const file = (e.currentTarget as HTMLInputElement).files?.[0];
+								if (!file) return;
+								const nameInput = e.currentTarget.form?.elements.namedItem('name') as HTMLInputElement | null;
+								if (nameInput && !nameInput.value.trim()) {
+									nameInput.value = file.name.replace(/\.[^.]+$/, '');
+								}
+							}}
 						/>
 					</form>
 
@@ -411,6 +419,14 @@
 						name="attachment"
 						accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
 						class="file-input file-input-bordered file-input-sm w-full mb-2"
+						onchange={(e) => {
+							const file = (e.currentTarget as HTMLInputElement).files?.[0];
+							if (!file) return;
+							const nameInput = e.currentTarget.form?.elements.namedItem('name') as HTMLInputElement | null;
+							if (nameInput && !nameInput.value.trim()) {
+								nameInput.value = file.name.replace(/\.[^.]+$/, '');
+							}
+						}}
 					/>
 					<div class="flex gap-2">
 						<button type="submit" class="btn btn-sm btn-primary">Add source</button>
